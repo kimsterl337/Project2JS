@@ -1,19 +1,23 @@
 import React, { Component } from 'react';
 import './App.scss';
-
-import Container from './components/Container';
 import Header from './components/Header';
+import CitySelection from './components/CitySelection';
 
 
 class App extends Component {
+
+  // some function that updates app state with the current selected city
+  // pass that function to your citySelection component as a prop
+
   render() {
     return (
       <div>
-        <Header 
+        <Header
         title = 'Weather App'
         message = 'Your Weather'
         />
-        <Container />
+        <CitySelection>
+        </CitySelection>
       </div>
     );
   }

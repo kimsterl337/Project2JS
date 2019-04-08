@@ -1,39 +1,97 @@
-import React from 'react';
+import React, { Component } from 'react';
+import axios from 'axios';
 
-const sampleKey = '7ae74236b4e2e58155be1c0b93204d31';
-const location = [
-	{ 
-		name: 'Toronto',
-		lat: 43.6532,
-		long: 79.3832
-	}
-];
 
-const url = 'https://api.darksky.net/forecast/'+ {sampleKey} + '/' + location.lat +',' + location.long
 
-fetch(url, {
-	mode: 'no-cors',
-	headers: {
-                "Content-Type": "application/json"
-            }
-})
-.then(function(response) {
-      return response.json(); // This method is part of the fetch API and returns another promise
-  })
-  .then(function(data) {
-      console.log(data);
-  })
-  .catch(function(err) {
-      console.error(err);
-  });
+class Container extends Component {
 
-class Container extends React.Component {
+		constructor (props) {
+			super(props)
+
+			this.state = {
+				weather: {
+					data: []
+				}
+			}
+			this.sampleKey = '7ae74236b4e2e58155be1c0b93204d31'
+
+			this.url = 'https://cors-anywhere.herokuapp.com/https://api.darksky.net/forecast/' + this.sampleKey + '/' + this.props.lat + ',' + this.props.long;
+		}
+		componentDidMount() {
+			this.getWeatherData();
+		}
+
+		componentDidUpdate() {
+			console.log(this.state.weather);
+		}
+
+
+		async getWeatherData() {
+
+			try {
+				const weatherData = await axios (this.url
+				);
+				
+				const { daily: weather } = weatherData.data;
+
+				this.setState({
+					weather: weather
+
+				});
+
+			} catch(err) {
+
+				console.log(err.message);
+
+			}
+		}
+
+		renderWeather() {
+			const { weather } = this.state
+
+			console.log(weather);
+
+			const weatherHtml = weather.data.map(item => {
+				
+				const { 
+					time, 
+					icon, 
+					temperatureHigh, 
+					temperatureLow
+				} = item;
+
+
+				return (
+					<div key = { time } className="weatherCard">
+						<p className="weatherIcon"> OUTLOOK: { icon }</p>
+						<p className="weatherTime"> Date: {time} </p>
+						<p className="weatherTemperatureHigh"> High Temperature: { temperatureHigh }</p>
+						<p className="weatherTemperatureLow"> Low Temperature: { temperatureLow }</p>
+					</div>	
+				);
+			});
+
+			return weatherHtml;
+		}
+
+		renderLoader() {
+			return <p> ...Loading</p>
+		}
 
 		render () {
 			return (
-				<h1>Hi</h1>
-			);
+				<section className="weatherListComponent">
+					<div className="weatherList">
+						{
+							this.state.weather.data.length 
+							? this.renderWeather()
+							: this.renderLoader()
+						}
+					</div>
+				</section>
+			)
 		}
 	}
 
 export default Container;
+
